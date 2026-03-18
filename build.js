@@ -25,107 +25,356 @@ const htmlTemplate = (title, content, breadcrumbs = '', isIndex = false) => `<!D
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${title} | ${SITE_TITLE}</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    
     :root {
-      --bg: #fefefe;
-      --text: #333;
-      --accent: #e67e22;
-      --muted: #666;
-      --border: #eee;
+      --bg: #ffffff;
+      --bg-secondary: #f9fafb;
+      --bg-tertiary: #f3f4f6;
+      --text: #111827;
+      --text-secondary: #6b7280;
+      --text-tertiary: #9ca3af;
+      --accent: #5046e5;
+      --accent-light: #eef2ff;
+      --border: #e5e7eb;
+      --border-light: #f3f4f6;
+      --success: #10b981;
+      --success-bg: #ecfdf5;
+      --warning: #f59e0b;
+      --warning-bg: #fffbeb;
+      --info: #3b82f6;
+      --info-bg: #eff6ff;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --radius: 8px;
+      --radius-lg: 12px;
     }
+    
     @media (prefers-color-scheme: dark) {
       :root {
-        --bg: #1a1a1a;
-        --text: #e0e0e0;
-        --accent: #f39c12;
-        --muted: #999;
-        --border: #333;
+        --bg: #0a0a0b;
+        --bg-secondary: #111113;
+        --bg-tertiary: #1a1a1d;
+        --text: #f9fafb;
+        --text-secondary: #9ca3af;
+        --text-tertiary: #6b7280;
+        --accent: #818cf8;
+        --accent-light: #1e1b4b;
+        --border: #27272a;
+        --border-light: #1f1f23;
+        --success: #34d399;
+        --success-bg: #064e3b;
+        --warning: #fbbf24;
+        --warning-bg: #451a03;
+        --info: #60a5fa;
+        --info-bg: #1e3a5f;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+        --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.4);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4);
       }
     }
-    * { box-sizing: border-box; }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 15px;
       line-height: 1.7;
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 2rem 1rem;
       background: var(--bg);
       color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
+    
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem;
+    }
+    
+    /* Header */
     header {
-      margin-bottom: 2rem;
-      padding-bottom: 1rem;
+      margin-bottom: 3rem;
+      padding-bottom: 1.5rem;
       border-bottom: 1px solid var(--border);
     }
+    
     header a {
-      color: var(--accent);
-      text-decoration: none;
+      font-size: 0.875rem;
       font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.01em;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
     }
-    h1 { margin-top: 0; color: var(--accent); }
-    h2, h3 { color: var(--text); margin-top: 2rem; }
-    a { color: var(--accent); }
-    .breadcrumbs { color: var(--muted); font-size: 0.9rem; margin-bottom: 1rem; }
-    .breadcrumbs a { color: var(--muted); }
-    ul.index { list-style: none; padding: 0; }
-    ul.index li { padding: 0.5rem 0; border-bottom: 1px solid var(--border); }
-    ul.index a { text-decoration: none; font-size: 1.1rem; }
-    .category { margin: 2rem 0; }
-    .category h2 { 
-      font-size: 1rem; 
-      text-transform: uppercase; 
-      letter-spacing: 0.1em;
-      color: var(--muted);
-      margin-bottom: 0.5rem;
+    
+    header a:hover { color: var(--accent); }
+    
+    header a::before {
+      content: '←';
+      font-size: 1rem;
+      opacity: 0.5;
     }
-    pre {
-      background: var(--border);
-      padding: 1rem;
-      border-radius: 4px;
-      overflow-x: auto;
+    
+    /* Breadcrumbs */
+    .breadcrumbs {
+      font-size: 0.8125rem;
+      color: var(--text-tertiary);
+      margin-bottom: 1.5rem;
     }
-    code {
-      background: var(--border);
-      padding: 0.2em 0.4em;
-      border-radius: 3px;
-      font-size: 0.9em;
+    
+    .breadcrumbs a {
+      color: var(--text-secondary);
+      text-decoration: none;
     }
-    pre code { background: none; padding: 0; }
-    blockquote {
-      border-left: 4px solid var(--accent);
+    
+    .breadcrumbs a:hover { color: var(--accent); }
+    
+    /* Typography */
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      margin-bottom: 1.5rem;
+      color: var(--text);
+    }
+    
+    h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-top: 2.5rem;
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
+    
+    h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-top: 2rem;
+      margin-bottom: 0.75rem;
+      color: var(--text);
+    }
+    
+    p { margin-bottom: 1rem; color: var(--text-secondary); }
+    
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    
+    strong { font-weight: 600; color: var(--text); }
+    
+    hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2.5rem 0;
+    }
+    
+    /* Lists */
+    ul, ol {
       margin: 1rem 0;
-      padding-left: 1rem;
-      color: var(--muted);
+      padding-left: 1.5rem;
+      color: var(--text-secondary);
     }
+    
+    li {
+      margin-bottom: 0.5rem;
+      padding-left: 0.25rem;
+    }
+    
+    li::marker { color: var(--text-tertiary); }
+    
+    /* Index list (home page) */
+    ul.index {
+      list-style: none;
+      padding: 0;
+      display: grid;
+      gap: 0.5rem;
+    }
+    
+    ul.index li {
+      margin: 0;
+      padding: 0;
+    }
+    
+    ul.index a {
+      display: flex;
+      align-items: center;
+      padding: 0.875rem 1rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+    
+    ul.index a:hover {
+      background: var(--bg-tertiary);
+      border-color: var(--border);
+      transform: translateX(4px);
+    }
+    
+    ul.index a::after {
+      content: '→';
+      margin-left: auto;
+      color: var(--text-tertiary);
+      font-size: 0.875rem;
+    }
+    
+    /* Categories */
+    .category {
+      margin: 2.5rem 0;
+    }
+    
+    .category h2 {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-tertiary);
+      margin-bottom: 0.75rem;
+      margin-top: 0;
+    }
+    
+    /* Callouts / Blockquotes */
+    blockquote {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-light);
+      border-left: 3px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+      margin: 1.5rem 0;
+      color: var(--text-secondary);
+    }
+    
+    blockquote p { margin: 0; }
+    blockquote p + p { margin-top: 0.75rem; }
+    
+    blockquote strong {
+      display: block;
+      color: var(--text);
+      margin-bottom: 0.25rem;
+    }
+    
+    /* Info/Note callout */
+    blockquote:has(strong:first-child) {
+      background: var(--info-bg);
+      border-color: var(--info);
+      border-left-color: var(--info);
+    }
+    
+    /* Code */
+    code {
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: 0.875em;
+      background: var(--bg-tertiary);
+      padding: 0.2em 0.4em;
+      border-radius: 4px;
+      color: var(--text);
+    }
+    
+    pre {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+      overflow-x: auto;
+      margin: 1.5rem 0;
+    }
+    
+    pre code {
+      background: none;
+      padding: 0;
+      font-size: 0.8125rem;
+      line-height: 1.6;
+    }
+    
+    /* Tables */
     table {
       width: 100%;
       border-collapse: collapse;
-      margin: 1rem 0;
+      margin: 1.5rem 0;
+      font-size: 0.875rem;
     }
-    th, td {
+    
+    th {
       text-align: left;
-      padding: 0.5rem;
+      font-weight: 600;
+      color: var(--text);
+      padding: 0.75rem 1rem;
+      background: var(--bg-secondary);
       border-bottom: 1px solid var(--border);
     }
+    
+    th:first-child { border-radius: var(--radius) 0 0 0; }
+    th:last-child { border-radius: 0 var(--radius) 0 0; }
+    
+    td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border-light);
+      color: var(--text-secondary);
+    }
+    
+    tr:hover td { background: var(--bg-secondary); }
+    
+    /* Images */
+    img {
+      max-width: 100%;
+      height: auto;
+      border-radius: var(--radius);
+      margin: 1.5rem 0;
+    }
+    
+    /* Footer */
     footer {
-      margin-top: 3rem;
-      padding-top: 1rem;
+      margin-top: 4rem;
+      padding-top: 1.5rem;
       border-top: 1px solid var(--border);
-      color: var(--muted);
-      font-size: 0.9rem;
+      color: var(--text-tertiary);
+      font-size: 0.8125rem;
+    }
+    
+    footer a { color: var(--text-secondary); }
+    footer a:hover { color: var(--accent); }
+    
+    /* Page title styling for index */
+    main > h1:first-child {
+      margin-bottom: 0.5rem;
+    }
+    
+    main > h1:first-child + p {
+      font-size: 1.0625rem;
+      color: var(--text-secondary);
+      margin-bottom: 2.5rem;
+    }
+    
+    /* Responsive */
+    @media (max-width: 640px) {
+      .container { padding: 2rem 1rem; }
+      h1 { font-size: 1.5rem; }
+      h2 { font-size: 1.125rem; }
     }
   </style>
 </head>
 <body>
-  <header>
-    <a href="${BASE_PATH}/">${SITE_TITLE}</a>
-  </header>
-  ${breadcrumbs ? `<div class="breadcrumbs">${breadcrumbs}</div>` : ''}
-  <main>
-    ${content}
-  </main>
-  <footer>
-    Generated with <a href="https://github.com/elazzabi/obsidian-static-site">obsidian-static-site</a>
-  </footer>
+  <div class="container">
+    <header>
+      <a href="${BASE_PATH}/">${SITE_TITLE}</a>
+    </header>
+    ${breadcrumbs ? `<div class="breadcrumbs">${breadcrumbs}</div>` : ''}
+    <main>
+      ${content}
+    </main>
+    <footer>
+      Built with <a href="https://github.com/elazzabi/obsidian-static-site">obsidian-static-site</a>
+    </footer>
+  </div>
 </body>
 </html>`;
 
