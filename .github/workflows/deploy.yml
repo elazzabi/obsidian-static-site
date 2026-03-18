@@ -34,8 +34,8 @@ jobs:
         env:
           SOURCE_DIR: ./content
           OUTPUT_DIR: ./dist
-          SITE_TITLE: ${{ vars.SITE_TITLE || 'My Recipes' }}
-          SITE_DESCRIPTION: ${{ vars.SITE_DESCRIPTION || 'A collection of recipes' }}
+          SITE_TITLE: ${{ vars.SITE_TITLE || 'Ahmed's Recipes' }}
+          SITE_DESCRIPTION: ${{ vars.SITE_DESCRIPTION || 'Tested recipes from my kitchen. If it's here, it worked.' }}
           BASE_PATH: /${{ github.event.repository.name }}
       
       - name: Upload artifact
