@@ -36,6 +36,7 @@ jobs:
           OUTPUT_DIR: ./dist
           SITE_TITLE: ${{ vars.SITE_TITLE || 'My Recipes' }}
           SITE_DESCRIPTION: ${{ vars.SITE_DESCRIPTION || 'A collection of recipes' }}
+          BASE_PATH: /${{ github.event.repository.name }}
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

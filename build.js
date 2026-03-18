@@ -15,6 +15,7 @@ const SOURCE_DIR = process.env.SOURCE_DIR || './content';
 const OUTPUT_DIR = process.env.OUTPUT_DIR || './dist';
 const SITE_TITLE = process.env.SITE_TITLE || 'My Recipes';
 const SITE_DESCRIPTION = process.env.SITE_DESCRIPTION || 'A collection of recipes';
+const BASE_PATH = process.env.BASE_PATH || ''; // e.g., '/obsidian-static-site' for GitHub Pages
 
 // HTML template
 const htmlTemplate = (title, content, breadcrumbs = '', isIndex = false) => `<!DOCTYPE html>
@@ -116,7 +117,7 @@ const htmlTemplate = (title, content, breadcrumbs = '', isIndex = false) => `<!D
 </head>
 <body>
   <header>
-    <a href="/">${SITE_TITLE}</a>
+    <a href="${BASE_PATH}/">${SITE_TITLE}</a>
   </header>
   ${breadcrumbs ? `<div class="breadcrumbs">${breadcrumbs}</div>` : ''}
   <main>
@@ -167,8 +168,8 @@ function generateBreadcrumbs(urlPath) {
   const parts = urlPath.split('/').filter(Boolean);
   if (parts.length <= 1) return '';
   
-  let crumbs = '<a href="/">Home</a>';
-  let currentPath = '';
+  let crumbs = `<a href="${BASE_PATH}/">Home</a>`;
+  let currentPath = BASE_PATH;
   
   for (let i = 0; i < parts.length - 1; i++) {
     currentPath += '/' + parts[i];
@@ -226,7 +227,7 @@ function buildIndex(files) {
   if (rootFiles.length > 0) {
     content += '<ul class="index">\n';
     for (const file of rootFiles.sort((a, b) => a.name.localeCompare(b.name))) {
-      content += `  <li><a href="/${file.urlPath}">${file.name}</a></li>\n`;
+      content += `  <li><a href="${BASE_PATH}/${file.urlPath}">${file.name}</a></li>\n`;
     }
     content += '</ul>\n';
   }
@@ -239,7 +240,7 @@ function buildIndex(files) {
     content += `  <h2>${category}</h2>\n`;
     content += '  <ul class="index">\n';
     for (const file of categoryFiles) {
-      content += `    <li><a href="/${file.urlPath}">${file.name}</a></li>\n`;
+      content += `    <li><a href="${BASE_PATH}/${file.urlPath}">${file.name}</a></li>\n`;
     }
     content += '  </ul>\n</div>\n';
   }
