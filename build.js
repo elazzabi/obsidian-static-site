@@ -379,6 +379,16 @@ const htmlTemplate = (title, content, breadcrumbs = '', isIndex = false) => `<!D
 </html>`;
 
 // Utility functions
+function slugify(str) {
+  return str
+    .toLowerCase()
+    .replace(/\s+/g, '-')           // Replace spaces with -
+    .replace(/[^\w\-\.\/]+/g, '')   // Remove special chars (keep . / -)
+    .replace(/\-\-+/g, '-')         // Replace multiple - with single -
+    .replace(/^-+/, '')             // Trim - from start
+    .replace(/-+$/, '');            // Trim - from end
+}
+
 function ensureDir(dirPath) {
   if (!fs.existsSync(dirPath)) {
     fs.mkdirSync(dirPath, { recursive: true });
@@ -400,10 +410,11 @@ function getAllMarkdownFiles(dir, baseDir = dir) {
       }
     } else if (item.endsWith('.md') && !item.startsWith('.')) {
       const relativePath = path.relative(baseDir, fullPath);
+      const urlPath = slugify(relativePath.replace(/\.md$/, '.html'));
       files.push({
         sourcePath: fullPath,
         relativePath: relativePath,
-        urlPath: relativePath.replace(/\.md$/, '.html'),
+        urlPath: urlPath,
         name: item.replace(/\.md$/, ''),
         category: path.dirname(relativePath) === '.' ? null : path.dirname(relativePath)
       });
