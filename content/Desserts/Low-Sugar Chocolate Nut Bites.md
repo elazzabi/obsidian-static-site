@@ -1,3 +1,13 @@
+---
+prep_time: 10
+cook_time: 15
+total_time: 25
+servings: "18 pieces"
+equipment: [thermomix, oven]
+difficulty: easy
+freezable: true
+---
+
 # Low-Sugar Chocolate Nut Bites (Thermomix)
 
 Rich, fudgy chocolate bites with nuts. Low sugar thanks to 55% dark chocolate doing the heavy lifting.
@@ -72,5 +82,9 @@ Rich, fudgy chocolate bites with nuts. Low sugar thanks to 55% dark chocolate do
 ## Notes
 
 - 55% chocolate is sweeter than 70%, so little/no added sugar needed
-- **Turbo mode for grating** — works perfectly
+- **Turbo mode for grating** — Med's adjustment, works perfectly
 - First batch: perfect ✅
+
+---
+
+*Added: 2026-03-14*

@@ -1,3 +1,13 @@
+---
+prep_time: 30
+cook_time: 40
+total_time: 70
+servings: "12 slices"
+equipment: [thermomix, oven]
+difficulty: medium
+freezable: true
+---
+
 # Moroccan Chocolate Velvet Cake (Thermomix)
 *A moist, Lben-based chocolate cake with stable Chocolate Kiri Frosting.*
 

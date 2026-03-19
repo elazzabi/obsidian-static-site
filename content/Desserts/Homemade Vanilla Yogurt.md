@@ -1,3 +1,13 @@
+---
+prep_time: 5
+cook_time: 0
+total_time: 365
+servings: "9 small jars"
+equipment: [blender, oven]
+difficulty: easy
+freezable: false
+---
+
 # Homemade Vanilla Yogurt (Oven Method)
 
 Dead simple yogurt using residual oven heat. No yogurt maker needed.

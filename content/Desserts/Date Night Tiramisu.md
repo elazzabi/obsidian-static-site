@@ -1,3 +1,13 @@
+---
+prep_time: 15
+cook_time: 6
+total_time: 21
+servings: "4 small or 2 generous"
+equipment: [thermomix]
+difficulty: medium
+freezable: false
+---
+
 # Date Night Tiramisu (Thermomix)
 
 A low-sugar, pregnancy-safe tiramisu with pasteurized eggs. Perfect for two.

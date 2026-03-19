@@ -354,11 +354,123 @@ const htmlTemplate = (title, content, breadcrumbs = '', isIndex = false) => `<!D
       margin-bottom: 2.5rem;
     }
     
+    /* Filters */
+    .filters {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      margin-bottom: 2rem;
+    }
+    
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .filter-row:last-of-type { margin-bottom: 0.75rem; }
+    
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .filter-group > label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-tertiary);
+    }
+    
+    .filter-group select {
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 0.875rem;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    
+    .filter-group select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    
+    .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+    
+    .checkbox {
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      text-transform: capitalize;
+    }
+    
+    .checkbox input[type="checkbox"] {
+      width: 1rem;
+      height: 1rem;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+    
+    .filter-status {
+      font-size: 0.8125rem;
+      color: var(--text-tertiary);
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--border-light);
+    }
+    
+    .filter-status span {
+      font-weight: 600;
+      color: var(--accent);
+    }
+    
+    /* Recipe cards with badges */
+    .recipe-list a {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.25rem;
+    }
+    
+    .recipe-name {
+      font-weight: 500;
+    }
+    
+    .recipe-badges {
+      font-size: 0.75rem;
+      color: var(--text-tertiary);
+      font-weight: 400;
+    }
+    
+    .recipe-list a::after {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    
+    .recipe-list li {
+      position: relative;
+    }
+    
     /* Responsive */
     @media (max-width: 640px) {
       .container { padding: 2rem 1rem; }
       h1 { font-size: 1.5rem; }
       h2 { font-size: 1.125rem; }
+      .filter-row { flex-direction: column; gap: 1rem; }
     }
   </style>
 </head>
@@ -411,12 +523,27 @@ function getAllMarkdownFiles(dir, baseDir = dir) {
     } else if (item.endsWith('.md') && !item.startsWith('.')) {
       const relativePath = path.relative(baseDir, fullPath);
       const urlPath = slugify(relativePath.replace(/\.md$/, '.html'));
+      
+      // Parse frontmatter
+      const source = fs.readFileSync(fullPath, 'utf8');
+      const { attributes } = fm(source);
+      
       files.push({
         sourcePath: fullPath,
         relativePath: relativePath,
         urlPath: urlPath,
         name: item.replace(/\.md$/, ''),
-        category: path.dirname(relativePath) === '.' ? null : path.dirname(relativePath)
+        category: path.dirname(relativePath) === '.' ? null : path.dirname(relativePath),
+        // Frontmatter metadata
+        meta: {
+          prep_time: attributes.prep_time || null,
+          cook_time: attributes.cook_time || null,
+          total_time: attributes.total_time || null,
+          servings: attributes.servings || null,
+          equipment: attributes.equipment || [],
+          difficulty: attributes.difficulty || null,
+          freezable: attributes.freezable || false
+        }
       });
     }
   }
@@ -466,6 +593,14 @@ function buildPage(file) {
 }
 
 function buildIndex(files) {
+  // Collect all unique equipment
+  const allEquipment = new Set();
+  files.forEach(f => {
+    if (f.meta.equipment) {
+      f.meta.equipment.forEach(e => allEquipment.add(e));
+    }
+  });
+  
   // Group files by category
   const categories = {};
   const rootFiles = [];
@@ -483,11 +618,69 @@ function buildIndex(files) {
   
   let content = `<h1>${SITE_TITLE}</h1>\n<p>${SITE_DESCRIPTION}</p>\n`;
   
+  // Filter controls
+  content += `
+<div class="filters">
+  <div class="filter-row">
+    <div class="filter-group">
+      <label>⏱️ Time</label>
+      <select id="filter-time">
+        <option value="all">All</option>
+        <option value="15">Under 15 min</option>
+        <option value="30">Under 30 min</option>
+        <option value="60">Under 1 hour</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>📊 Difficulty</label>
+      <select id="filter-difficulty">
+        <option value="all">All</option>
+        <option value="easy">Easy</option>
+        <option value="medium">Medium</option>
+        <option value="hard">Hard</option>
+      </select>
+    </div>
+  </div>
+  <div class="filter-row">
+    <div class="filter-group">
+      <label>🔧 Equipment</label>
+      <div class="checkbox-group">
+        ${[...allEquipment].sort().map(e => `<label class="checkbox"><input type="checkbox" value="${e}" class="filter-equipment"> ${e}</label>`).join('\n        ')}
+      </div>
+    </div>
+    <div class="filter-group">
+      <label class="checkbox"><input type="checkbox" id="filter-freezable"> ❄️ Freezable only</label>
+    </div>
+  </div>
+  <div class="filter-status">
+    <span id="filter-count">${files.length}</span> of ${files.length} recipes
+  </div>
+</div>
+`;
+  
+  // Helper to generate recipe card
+  function recipeCard(file) {
+    const meta = file.meta;
+    const dataAttrs = `data-time="${meta.total_time || 999}" data-difficulty="${meta.difficulty || ''}" data-equipment="${(meta.equipment || []).join(',')}" data-freezable="${meta.freezable}"`;
+    
+    let badges = [];
+    if (meta.total_time) badges.push(`${meta.total_time} min`);
+    if (meta.difficulty) badges.push(meta.difficulty);
+    if (meta.freezable) badges.push('❄️');
+    
+    return `    <li class="recipe-card" ${dataAttrs}>
+      <a href="${BASE_PATH}/${file.urlPath}">
+        <span class="recipe-name">${file.name}</span>
+        ${badges.length ? `<span class="recipe-badges">${badges.join(' • ')}</span>` : ''}
+      </a>
+    </li>`;
+  }
+  
   // Root files first
   if (rootFiles.length > 0) {
-    content += '<ul class="index">\n';
+    content += '<ul class="index recipe-list">\n';
     for (const file of rootFiles.sort((a, b) => a.name.localeCompare(b.name))) {
-      content += `  <li><a href="${BASE_PATH}/${file.urlPath}">${file.name}</a></li>\n`;
+      content += recipeCard(file) + '\n';
     }
     content += '</ul>\n';
   }
@@ -498,12 +691,69 @@ function buildIndex(files) {
     const categoryFiles = categories[category].sort((a, b) => a.name.localeCompare(b.name));
     content += `<div class="category">\n`;
     content += `  <h2>${category}</h2>\n`;
-    content += '  <ul class="index">\n';
+    content += '  <ul class="index recipe-list">\n';
     for (const file of categoryFiles) {
-      content += `    <li><a href="${BASE_PATH}/${file.urlPath}">${file.name}</a></li>\n`;
+      content += recipeCard(file) + '\n';
     }
     content += '  </ul>\n</div>\n';
   }
+  
+  // Filter JavaScript
+  content += `
+<script>
+(function() {
+  const cards = document.querySelectorAll('.recipe-card');
+  const timeSelect = document.getElementById('filter-time');
+  const difficultySelect = document.getElementById('filter-difficulty');
+  const equipmentCheckboxes = document.querySelectorAll('.filter-equipment');
+  const freezableCheckbox = document.getElementById('filter-freezable');
+  const countSpan = document.getElementById('filter-count');
+  
+  function applyFilters() {
+    const maxTime = timeSelect.value === 'all' ? 9999 : parseInt(timeSelect.value);
+    const difficulty = difficultySelect.value;
+    const selectedEquipment = [...equipmentCheckboxes].filter(cb => cb.checked).map(cb => cb.value);
+    const freezableOnly = freezableCheckbox.checked;
+    
+    let visibleCount = 0;
+    
+    cards.forEach(card => {
+      const time = parseInt(card.dataset.time) || 9999;
+      const cardDifficulty = card.dataset.difficulty;
+      const cardEquipment = card.dataset.equipment ? card.dataset.equipment.split(',') : [];
+      const cardFreezable = card.dataset.freezable === 'true';
+      
+      let show = true;
+      
+      // Time filter
+      if (time > maxTime) show = false;
+      
+      // Difficulty filter
+      if (difficulty !== 'all' && cardDifficulty !== difficulty) show = false;
+      
+      // Equipment filter (must have ALL selected)
+      if (selectedEquipment.length > 0) {
+        const hasAll = selectedEquipment.every(e => cardEquipment.includes(e));
+        if (!hasAll) show = false;
+      }
+      
+      // Freezable filter
+      if (freezableOnly && !cardFreezable) show = false;
+      
+      card.style.display = show ? '' : 'none';
+      if (show) visibleCount++;
+    });
+    
+    countSpan.textContent = visibleCount;
+  }
+  
+  timeSelect.addEventListener('change', applyFilters);
+  difficultySelect.addEventListener('change', applyFilters);
+  equipmentCheckboxes.forEach(cb => cb.addEventListener('change', applyFilters));
+  freezableCheckbox.addEventListener('change', applyFilters);
+})();
+</script>
+`;
   
   return htmlTemplate(SITE_TITLE, content, '', true);
 }
